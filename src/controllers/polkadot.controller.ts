@@ -144,7 +144,7 @@ export class PolkadotController {
 
   @post('/createArtCollection')
   @response(200, PING_RESPONSE_CREATE_ART_COLLECTION)
-  // @authenticate('jwt')
+  @authenticate('jwt')
   async createArtCollection(
     @requestBody({
       content: {
@@ -176,7 +176,7 @@ export class PolkadotController {
 
   @post('/issueArtOwnership')
   @response(200, PING_RESPONSE_ISSUE_ART_COLLECTION)
-  // @authenticate('jwt')
+  @authenticate('jwt')
   async issueArtOwnership(
     @requestBody({
       content: {
@@ -206,7 +206,7 @@ export class PolkadotController {
 
   @get('/nftCount/{sid}')
   @response(200, PING_RESPONSE_GET_NFT_COUNT)
-  // @authenticate('jwt')
+  @authenticate('jwt')
   async nftCount(
     @param.path.string('sid') sid: number,
   ): Promise<object> {
@@ -222,7 +222,7 @@ export class PolkadotController {
 
   @get('/nftBindInfos/{bid}/{sid}')
   @response(200, PING_RESPONSE_GET_NFT_BIND_INFOS)
-  // @authenticate('jwt')
+  @authenticate('jwt')
   async nftBindInfos(
     @param.path.string('bid') bid: string,
     @param.path.string('sid') sid: number,
