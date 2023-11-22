@@ -20,12 +20,7 @@ export class ExpressServer {
 
     // Custom Express routes
     this.app.get('/', function (_req: Request, res: Response) {
-      // redirect to /api
-      res.redirect('/api');
-    });
-
-    this.app.get('/hello', function (_req: Request, res: Response) {
-      res.send('Hello world!');
+      res.redirect('/api/explorer/');
     });
 
   }
