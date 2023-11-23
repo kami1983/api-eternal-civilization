@@ -9,7 +9,7 @@ async function exportOpenApiSpec(): Promise<void> {
   const config: ApplicationConfig = {
     rest: {
       port: +(process.env.PORT ?? 3000),
-      host: process.env.HOST ?? 'localhost',
+      host: process.env.ALLOWN_HOST ?? 'localhost',
     },
   };
   const outFile = process.argv[2] ?? '';
