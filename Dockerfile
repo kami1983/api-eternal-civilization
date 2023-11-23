@@ -14,6 +14,7 @@ WORKDIR /home/node/app
 # where available (npm@5+)
 COPY --chown=node package*.json ./
 
+
 RUN npm install
 
 # Bundle app source code
@@ -23,8 +24,7 @@ RUN npm run build
 RUN rm -f .env
 
 # Bind to all network interfaces so that it can be mapped to the host OS
-# ENV HOST=0.0.0.0 PORT=3000
+ENV HOST=0.0.0.0 PORT=3000
 
-# EXPOSE ${PORT}
-EXPOSE 3000
+EXPOSE ${PORT}
 CMD [ "node", "." ]
