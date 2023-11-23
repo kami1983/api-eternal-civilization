@@ -31,10 +31,10 @@ export class ExpressServer {
 
   public async start() {
     // await this.lbApp.start();
-    // const port = this.lbApp.restServer.config.port ?? 3000;
-    // const host = this.lbApp.restServer.config.host || '127.0.0.1';
-    const port = 3000;
-    const host = '127.0.0.1';
+    const port = this.lbApp.restServer.config.port ?? 3000;
+    const host = this.lbApp.restServer.config.host || '127.0.0.1';
+    // const port = 3000;
+    // const host = '127.0.0.1';
     this.server = this.app.listen(port, host);
     console.log(`Express server is running at http://${host}:${port}`);
     await once(this.server, 'listening');

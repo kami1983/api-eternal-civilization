@@ -1,14 +1,14 @@
 import {TryExpressApplication} from './application';
 import {ApplicationConfig, ExpressServer} from './server';
+require('dotenv').config();
 
 export {ApplicationConfig, TryExpressApplication};
 
 export async function main(options: ApplicationConfig = {}) {
-  console.log('main start begin')
+  console.log('main - ApplicationConfig', options);
   const server = new ExpressServer(options);
   await server.boot();
   await server.start();
-  console.log('main start end')
 }
 
 if (require.main === module) {

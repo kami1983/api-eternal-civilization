@@ -1,5 +1,6 @@
 import {ApplicationConfig} from '@loopback/core';
 import {TryExpressApplication} from './application';
+require('dotenv').config();
 
 /**
  * Export the OpenAPI spec from the application
