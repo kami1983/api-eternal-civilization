@@ -4,10 +4,11 @@ import {ApplicationConfig, ExpressServer} from './server';
 export {ApplicationConfig, TryExpressApplication};
 
 export async function main(options: ApplicationConfig = {}) {
-
+  console.log('main start begin')
   const server = new ExpressServer(options);
   await server.boot();
   await server.start();
+  console.log('main start end')
 }
 
 if (require.main === module) {
