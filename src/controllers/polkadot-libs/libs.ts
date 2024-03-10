@@ -33,6 +33,8 @@ export async function getNftBindInfos(bid: string, sid: number): Promise<string>
 
 export type ChainTxResult = {
   block_hash: string,
+  extrinsic_hash: String,
+  block_number: number,
   status: string,
   error_method: string,
   error_data: string,
@@ -51,6 +53,8 @@ export async function createArtCollectionOnChain(sid: number, name: string, uri:
   const doTx = (): Promise<ChainTxResult> => {
     let res: ChainTxResult = {
       block_hash: '0x0',
+      extrinsic_hash: '0x0',
+      block_number: 0,
       status: 'faild',
       error_method: '',
       error_data: '',
@@ -58,7 +62,8 @@ export async function createArtCollectionOnChain(sid: number, name: string, uri:
     return new Promise((resolve, reject) => {
       api.tx.eternalArtsModule
         .createArtCollection(sid, name, uri)
-        .signAndSend(newPair, {}, ({events = [], status}) => {
+        .signAndSend(newPair, {}, async ({events = [], status}) => {
+
           if (status.isInBlock) {
             events.forEach(({event: {data, method, section}, phase}) => {
               if (method.toLocaleLowerCase() === 'extrinsicfailed') {
@@ -69,7 +74,17 @@ export async function createArtCollectionOnChain(sid: number, name: string, uri:
               }
             });
           } else if (status.isFinalized) {
+
             res.block_hash = status.asFinalized.toHex()
+            await api.rpc.chain.getBlock(status.asFinalized).then((block) => {
+              block.block.extrinsics.find((extrinsic) => {
+                // https://polkadot.js.org/apps/?rpc=xxx#/extrinsics/decode/0x...
+                res.extrinsic_hash = extrinsic.method.toHex()
+                res.block_number = block.block.header.number.toNumber()
+              })
+            }
+            );
+
             resolve(res);
           }
         });
@@ -93,6 +108,8 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
   const doTx = (): Promise<ChainTxResult> => {
     let res: ChainTxResult = {
       block_hash: '0x0',
+      extrinsic_hash: '0x0',
+      block_number: 0,
       status: 'faild',
       error_method: '',
       error_data: '',
@@ -100,7 +117,7 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
     return new Promise((resolve, reject) => {
       api.tx.eternalArtsModule
         .issueArtOwnership(bids, sids, count)
-        .signAndSend(newPair, {}, ({events = [], status}) => {
+        .signAndSend(newPair, {}, async ({events = [], status}) => {
           if (status.isInBlock) {
             events.forEach(({event: {data, method, section}, phase}) => {
               if (method.toLocaleLowerCase() === 'extrinsicfailed') {
@@ -112,6 +129,15 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
             });
           } else if (status.isFinalized) {
             res.block_hash = status.asFinalized.toHex()
+            await api.rpc.chain.getBlock(status.asFinalized).then((block) => {
+              block.block.extrinsics.find((extrinsic) => {
+                // https://polkadot.js.org/apps/?rpc=xxx#/extrinsics/decode/0x...
+                res.extrinsic_hash = extrinsic.method.toHex()
+                res.block_number = block.block.header.number.toNumber()
+              })
+            }
+            );
+
             resolve(res);
           }
         });
