@@ -4,7 +4,7 @@ import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {Request, ResponseObject, RestBindings, get, param, post, requestBody, response} from '@loopback/rest';
 import dotenv from 'dotenv';
-import {createArtCollectionOnChain, getNftBindInfos, getNftCount, getPolkadotBalance, issueArtOwnershipOnChain} from './polkadot-libs/libs';
+import {createArtCollectionOnChain, getNftBindInfos, getNftCount, getPolkadotBalance, issueArtOwnershipOnChain, transferArtOwnershipOnChain} from './polkadot-libs/libs';
 
 dotenv.config();
 
@@ -155,19 +155,83 @@ export class PolkadotController {
               sid: {type: 'number'},
               name: {type: 'string'},
               uri: {type: 'string'},
+
+              asset_cate: {type: 'number'},
+              title: {type: 'string'},
+              thumb: {type: 'string'},
+              short_desc: {type: 'string'},
+              img_desc: {type: 'string'},
+              long_desc: {type: 'string'},
+              asset_url: {type: 'string'},
+              asset_ext: {type: 'string'},
+              group_id: {type: 'number'},
+              amount: {type: 'number'},
+              user_id: {type: 'number'},
+              price: {type: 'number'}
+
             },
           },
         },
       },
     })
-    requestData: {sid: number, name: string, uri: string},
+    requestData: {
+      sid: number,
+      name: string,
+      uri: string,
+      asset_cate: number | null,
+      title: string | null,
+      thumb: string | null,
+      short_desc: string | null,
+      img_desc: string | null,
+      long_desc: string | null,
+      asset_url: string | null,
+      asset_ext: string | null,
+      group_id: number | null,
+      amount: number | null,
+      user_id: number | null,
+      price: number | null
+    },
   ): Promise<object> {
-    const {sid, name, uri} = requestData
+    const {
+      sid,
+      name,
+      uri,
+
+      asset_cate,
+      title,
+      thumb,
+      short_desc,
+      img_desc,
+      long_desc,
+      asset_url,
+      asset_ext,
+      group_id,
+      amount,
+      user_id,
+      price
+    } = requestData
     return {
       sid,
       name,
       uri,
-      txData: await createArtCollectionOnChain(sid, name, uri),
+      txData: await createArtCollectionOnChain(
+        sid,
+        name,
+        uri,
+
+        asset_cate,
+        title,
+        thumb,
+        short_desc,
+        img_desc,
+        long_desc,
+        asset_url,
+        asset_ext,
+        group_id,
+        amount,
+        user_id,
+        price
+      ),
       date: new Date(),
       url: this.req.url,
       headers: Object.assign({}, this.req.headers),
@@ -235,6 +299,37 @@ export class PolkadotController {
       date: new Date(),
       url: this.req.url,
       // headers: Object.assign({}, this.req.headers),
+    };
+  }
+
+  @post('/transferArtOwnership')
+  @response(200, PING_RESPONSE_ISSUE_ART_COLLECTION)
+  @authenticate('jwt')
+  async transferArtOwnership(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              sid: {type: 'number'},
+              from: {type: 'string'},
+              to: {type: 'string'},
+              count: {type: 'number'},
+            },
+          },
+        },
+      },
+    })
+    requestData: {sid: number, from: string, to: string, count: number},
+  ): Promise<object> {
+    const {sid, from, to, count} = requestData
+    console.log({sid, from, to, count})
+    return {
+      txData: await transferArtOwnershipOnChain(sid, from, to, count),
+      date: new Date(),
+      url: this.req.url,
+      headers: Object.assign({}, this.req.headers),
     };
   }
 
