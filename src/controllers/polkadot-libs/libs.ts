@@ -1,6 +1,6 @@
 
 import {ApiPromise, Keyring, WsProvider} from '@polkadot/api';
-
+import BN from 'bn.js';
 
 export async function getPolkadotBalance(userAddress: string): Promise<string> {
   const rpc = process.env.POLKADOT_WSS
@@ -13,7 +13,7 @@ export async function getPolkadotBalance(userAddress: string): Promise<string> {
   return balance
 }
 
-export async function getNftCount(sid: number): Promise<string> {
+export async function getNftCount(sid: string): Promise<string> {
   const rpc = process.env.POLKADOT_WSS
   const wsProvider = new WsProvider(rpc);
   const api = await ApiPromise.create({provider: wsProvider});
@@ -22,7 +22,7 @@ export async function getNftCount(sid: number): Promise<string> {
   return count
 }
 
-export async function getNftBindInfos(bid: string, sid: number): Promise<string> {
+export async function getNftBindInfos(bid: string, sid: string): Promise<string> {
   const rpc = process.env.POLKADOT_WSS
   const wsProvider = new WsProvider(rpc);
   const api = await ApiPromise.create({provider: wsProvider});
@@ -40,10 +40,9 @@ export type ChainTxResult = {
   error_data: string,
 }
 export async function createArtCollectionOnChain(
-  sid: number,
+  sid: string,
   name: string,
   uri: string,
-
   asset_cate: number | null,
   title: string | null,
   thumb: string | null,
@@ -54,7 +53,7 @@ export async function createArtCollectionOnChain(
   asset_ext: string | null,
   group_id: number | null,
   amount: number | null,
-  user_id: number | null,
+  user_id: string | null,
   price: number | null
 
 ): Promise<ChainTxResult> {
@@ -68,6 +67,25 @@ export async function createArtCollectionOnChain(
   // Add an account, straight mnemonic
   const newPair = keyring.addFromUri(PHRASE);
 
+  console.log('DEBUG', {
+    sid,
+    name,
+    uri,
+    asset_cate,
+    title,
+    thumb,
+    short_desc,
+    img_desc,
+    long_desc,
+    asset_url,
+    asset_ext,
+    group_id,
+    amount,
+    user_id,
+    price
+
+  })
+
   const doTx = (): Promise<ChainTxResult> => {
     let res: ChainTxResult = {
       block_hash: '0x0',
@@ -80,10 +98,9 @@ export async function createArtCollectionOnChain(
     return new Promise((resolve, reject) => {
       api.tx.eternalArtsModule
         .createArtCollection(
-          sid,
+          new BN(sid.toString()),
           name,
           uri,
-
           asset_cate,
           title,
           thumb,
@@ -94,7 +111,7 @@ export async function createArtCollectionOnChain(
           asset_ext,
           group_id,
           amount,
-          user_id,
+          new BN(user_id?.toString() ?? '0'),
           price
         ).signAndSend(newPair, {}, async ({events = [], status}) => {
 
@@ -128,7 +145,7 @@ export async function createArtCollectionOnChain(
 }
 
 //
-export async function issueArtOwnershipOnChain(bids: string[], sids: number[], count: number[]): Promise<ChainTxResult> {
+export async function issueArtOwnershipOnChain(bids: string[], sids: string[], count: number[]): Promise<ChainTxResult> {
   const rpc = process.env.POLKADOT_WSS
   const wsProvider = new WsProvider(rpc);
   const api = await ApiPromise.create({provider: wsProvider});
@@ -138,6 +155,8 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
   const PHRASE = process.env.EC_OPERATOR_MNEMONIC ?? '';
   // Add an account, straight mnemonic
   const newPair = keyring.addFromUri(PHRASE);
+
+  const bigint_sids = sids.map((sid) => new BN(sid.toString()))
 
   const doTx = (): Promise<ChainTxResult> => {
     let res: ChainTxResult = {
@@ -150,7 +169,7 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
     }
     return new Promise((resolve, reject) => {
       api.tx.eternalArtsModule
-        .issueArtOwnership(bids, sids, count)
+        .issueArtOwnership(bids, bigint_sids, count)
         .signAndSend(newPair, {}, async ({events = [], status}) => {
           if (status.isInBlock) {
             events.forEach(({event: {data, method, section}, phase}) => {
@@ -182,7 +201,7 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: number[], c
 
 
 //
-export async function transferArtOwnershipOnChain(sid: number, from: string, to: string, count: number): Promise<ChainTxResult> {
+export async function transferArtOwnershipOnChain(sid: string, from: string, to: string, count: number): Promise<ChainTxResult> {
   const rpc = process.env.POLKADOT_WSS
   const wsProvider = new WsProvider(rpc);
   const api = await ApiPromise.create({provider: wsProvider});
@@ -204,7 +223,7 @@ export async function transferArtOwnershipOnChain(sid: number, from: string, to:
     }
     return new Promise((resolve, reject) => {
       api.tx.eternalArtsModule
-        .transferArtOwnership(sid, from, to, count)
+        .transferArtOwnership(new BN(sid.toString()), from, to, count)
         .signAndSend(newPair, {}, async ({events = [], status}) => {
           if (status.isInBlock) {
             events.forEach(({event: {data, method, section}, phase}) => {

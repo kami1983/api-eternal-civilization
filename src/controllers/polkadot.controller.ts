@@ -44,7 +44,7 @@ const PING_RESPONSE_CREATE_ART_COLLECTION: ResponseObject = {
         type: 'object',
         title: 'PolkadotResponse',
         properties: {
-          sid: {type: 'number'},
+          sid: {type: 'string'},
           name: {type: 'string'},
           url: {type: 'string'},
           txData: {type: 'object', properties: {block_hash: {type: 'string'}, status: {type: 'string'}, error_method: {type: 'string'}, error_data: {type: 'string'}}},
@@ -93,7 +93,7 @@ const PING_RESPONSE_GET_NFT_COUNT: ResponseObject = {
         type: 'object',
         title: 'PolkadotResponse',
         properties: {
-          sid: {type: 'number'},
+          sid: {type: 'string'},
           count: {type: 'string'},
           date: {type: 'string'},
           url: {type: 'string'},
@@ -112,7 +112,7 @@ const PING_RESPONSE_GET_NFT_BIND_INFOS: ResponseObject = {
         title: 'PolkadotResponse',
         properties: {
           bid: {type: 'string'},
-          sid: {type: 'number'},
+          sid: {type: 'string'},
           count: {type: 'string'},
           date: {type: 'string'},
           url: {type: 'string'},
@@ -152,7 +152,7 @@ export class PolkadotController {
           schema: {
             type: 'object',
             properties: {
-              sid: {type: 'number'},
+              sid: {type: 'string'},
               name: {type: 'string'},
               uri: {type: 'string'},
 
@@ -166,7 +166,7 @@ export class PolkadotController {
               asset_ext: {type: 'string'},
               group_id: {type: 'number'},
               amount: {type: 'number'},
-              user_id: {type: 'number'},
+              user_id: {type: 'string'},
               price: {type: 'number'}
 
             },
@@ -175,7 +175,7 @@ export class PolkadotController {
       },
     })
     requestData: {
-      sid: number,
+      sid: string,
       name: string,
       uri: string,
       asset_cate: number | null,
@@ -188,7 +188,7 @@ export class PolkadotController {
       asset_ext: string | null,
       group_id: number | null,
       amount: number | null,
-      user_id: number | null,
+      user_id: string | null,
       price: number | null
     },
   ): Promise<object> {
@@ -249,14 +249,14 @@ export class PolkadotController {
             type: 'object',
             properties: {
               bids: {type: 'array', items: {type: 'string'}},
-              sids: {type: 'array', items: {type: 'number'}},
+              sids: {type: 'array', items: {type: 'string'}},
               count: {type: 'array', items: {type: 'number'}},
             },
           },
         },
       },
     })
-    requestData: {bids: string[], sids: number[], count: number[]},
+    requestData: {bids: string[], sids: string[], count: number[]},
   ): Promise<object> {
     const {bids, sids, count} = requestData
     console.log({bids, sids, count})
@@ -272,7 +272,7 @@ export class PolkadotController {
   @response(200, PING_RESPONSE_GET_NFT_COUNT)
   @authenticate('jwt')
   async nftCount(
-    @param.path.string('sid') sid: number,
+    @param.path.string('sid') sid: string,
   ): Promise<object> {
 
     return {
@@ -289,7 +289,7 @@ export class PolkadotController {
   @authenticate('jwt')
   async nftBindInfos(
     @param.path.string('bid') bid: string,
-    @param.path.string('sid') sid: number,
+    @param.path.string('sid') sid: string,
   ): Promise<object> {
 
     return {
@@ -312,7 +312,7 @@ export class PolkadotController {
           schema: {
             type: 'object',
             properties: {
-              sid: {type: 'number'},
+              sid: {type: 'string'},
               from: {type: 'string'},
               to: {type: 'string'},
               count: {type: 'number'},
@@ -321,7 +321,7 @@ export class PolkadotController {
         },
       },
     })
-    requestData: {sid: number, from: string, to: string, count: number},
+    requestData: {sid: string, from: string, to: string, count: number},
   ): Promise<object> {
     const {sid, from, to, count} = requestData
     console.log({sid, from, to, count})
