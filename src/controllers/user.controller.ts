@@ -21,6 +21,9 @@ import {genSalt, hash} from 'bcryptjs';
 import _ from 'lodash';
 import {NewUserRequest} from '../models/new-user-request.model';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const CredentialsSchema: SchemaObject = {
   type: 'object',
   required: ['email', 'password'],
@@ -134,7 +137,14 @@ export class UserController {
       },
     })
     newUserRequest: NewUserRequest,
-  ): Promise<User> {
+  ): Promise<User | string> {
+
+    const ALLOWN_SIGNUP = parseFloat(process.env.ALLOWN_SIGNUP ?? '0') == 1;
+
+    if (!ALLOWN_SIGNUP) {
+      return 'Signup is not allowed';
+    }
+
     const password = await hash(newUserRequest.password, await genSalt());
     const savedUser = await this.userRepository.create(
       _.omit(newUserRequest, 'password'),
