@@ -10,6 +10,7 @@ export async function getPolkadotBalance(userAddress: string): Promise<string> {
   const data = await api.query.system.account(userAddress);
   // @ts-ignore
   const balance = data.data.free.toString();
+  wsProvider.disconnect();
   return balance
 }
 
@@ -19,6 +20,7 @@ export async function getNftCount(sid: string): Promise<string> {
   const api = await ApiPromise.create({provider: wsProvider});
   const data = await api.query.eternalArtsModule.nftCount(sid);
   const count = data.toString();
+  wsProvider.disconnect();
   return count
 }
 
@@ -28,6 +30,7 @@ export async function getNftBindInfos(bid: string, sid: string): Promise<string>
   const api = await ApiPromise.create({provider: wsProvider});
   const data = await api.query.eternalArtsModule.nftBindInfos([bid, sid]);
   const count = data.toString();
+  wsProvider.disconnect();
   return count
 }
 
@@ -135,7 +138,7 @@ export async function createArtCollectionOnChain(
               })
             }
             );
-
+            wsProvider.disconnect();
             resolve(res);
           }
         });
@@ -190,7 +193,7 @@ export async function issueArtOwnershipOnChain(bids: string[], sids: string[], c
               })
             }
             );
-
+            wsProvider.disconnect();
             resolve(res);
           }
         });
@@ -244,7 +247,7 @@ export async function transferArtOwnershipOnChain(sid: string, from: string, to:
               })
             }
             );
-
+            wsProvider.disconnect();
             resolve(res);
           }
         });
